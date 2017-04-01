@@ -4,6 +4,11 @@ import { Navbar, Nav, NavItem } from 'react-bootstrap';
 
 class Header extends Component {
 
+    // We want to send this up to the main App Component - so we make it a property
+    onLoginClick(){
+        this.props.onLoginClick();
+    }
+
     render() {
         return (
 
@@ -17,7 +22,7 @@ class Header extends Component {
                 <Nav>
                     <NavItem href="#">Authors</NavItem>
                     <NavItem href="#">How It Works</NavItem>
-                    <NavItem href="#">Log In</NavItem>
+                    <NavItem onClick={this.onLoginClick.bind(this)} href="#">Log In</NavItem>
                     <NavItem href="#">Sign Up</NavItem>
                 </Nav>
             </Navbar>
