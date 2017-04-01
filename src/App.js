@@ -17,29 +17,40 @@ class App extends Component {
         domain: 'monichre.auth0.com'
     }
 
-    // This is a lifecycle method instantiating our Auth0 Object (I think)
-    componentWillMount(){
+    setData(accessToken, profile) {
+        localStorage.setItem('accessToken', accessToken); //Saving to local storage - which can only accept strings * normally we would do this in a database
+        localStorage.setItem('profile', JSON.stringify(profile)); // Therefore we will be using JSON.stringify
+
+        this.setState({ // Now saving to 'state'
+            accessToken: localStorage.getItem('accessToken'),
+            profile: JSON.parse(localStorage.getItem('profile')) // We need to convert this back to a JSON object for our programming purposes
+        });
+    }
+    getData(){ // Will check for Token and get profile data
+        if( localStorage.getItem('accessToken') != null ) {
+
+            this.setState({ // Will set state if local storage exists
+                accessToken: localStorage.getItem('accessToken'),
+                profile: JSON.parse(localStorage.getItem('profile')) // We need to convert this back to a JSON object for our programming purposes
+            }, () => {
+                console.log(this.state);
+            });
+        }
+    }
+    componentWillMount(){ // This is a lifecycle method instantiating our Auth0 Object (I think)
         this.lock = new Auth0Lock(this.props.clientId, this.props.domain);
 
-        // This adds a callback for an authenticated login event
-        this.lock.on('authenticated', (authResult) => {
-            console.log(authResult);
+        this.lock.on('authenticated', (authResult) => { // This adds a callback for an authenticated login event
             this.lock.getUserInfo(authResult.accessToken, (err, profile) => {
                 if(!err){
-                    console.log(profile);
-                } else {
-                    console.log(err);
+                    this.setData(authResult.accessToken, profile);
                 }
-
             });
         });
 
-        // This binds login functions to keep this context
-        // this.login = this.login.bind(this)
+        this.getData();
     }
-
-    //This method receives the onLoginClick from our Header Component
-    showLock(){
+    showLock(){ //This method receives the onLoginClick from our Header Component
         this.lock.show();
     }
 
